@@ -1,6 +1,7 @@
 #pragma once
 #include <cmath>
 
+#pragma warning(disable:26495)
 class Vector3
 {
 public:
@@ -77,32 +78,35 @@ public:
 	}
 
 	// Convert the vector to have a length of 1
-	void Normalize()
+	Vector3 Normalize()
 	{
 		float length = Length();
-		if (length == 0.0f) return;
+		if (length == 0.0f) return *this;
 
+		Vector3 copy = *this;
 		float norm = 1.0f / length;
-		x *= norm;
-		y *= norm;
-		z *= norm;
+		copy.x *= norm;
+		copy.y *= norm;
+		copy.z *= norm;
+
+		return copy;
 	}
 
-	// Linearly interpolate between two vectors
+	// Linearly interpolate between two vectors by amount t
 	Vector3 Lerp(const Vector3& to, float t)
 	{
 		t = fmaxf(fminf(t, 1.0f), 0.0f);
 		return Vector3(x + (to.x - x) * t, y + (to.y - y) * t, z + (to.z - z) * t);
 	}
 
-	// Reflect this vector about a given normal vector
+	// Reflects a vector off the plane defined by a normal
 	Vector3 Reflect(const Vector3& normal)
 	{
 		float d = Dot(normal);
 		return Vector3(x - 2.0f * d * normal.x, y - 2.0f * d * normal.y, z - 2.0f * d * normal.z);
 	}
 
-	// Spherically interpolate between two vectors
+	// Spherically interpolate between two vectors by amount t
 	Vector3 Slerp(const Vector3& to, float t)
 	{
 		t = fmaxf(fminf(t, 1.0f), 0.0f);
@@ -120,4 +124,14 @@ public:
 
 		return Vector3(x * w1 + to.x * w2, y * w1 + to.y * w2, z * w1 + to.z * w2);
 	}
+	
+	// Returns the distance between two vectors
+	float Distance(const Vector3& other)
+	{
+		float dx = x - other.x;
+		float dy = y - other.y;
+		float dz = z - other.z;
+		return sqrtf(dx * dx + dy * dy + dz * dz);
+	}
 };
+#pragma warning(default:26495)
