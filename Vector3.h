@@ -1,10 +1,11 @@
 #pragma once
 #include <cmath>
 
-#pragma warning(disable:26495)
+#pragma warning(disable:26495) // "Variable 'variable' is uninitialized. Always initialize a member variable"
 class Vector3
 {
 public:
+	// Using a union to allow both upper and lowercase usage on xyz components
 	union
 	{
 		struct
@@ -77,7 +78,7 @@ public:
 		return (x * right.x) + (y * right.y) + (z * right.z);
 	}
 
-	// Convert the vector to have a length of 1
+	// Convert the vector to have a length of 1 (returns a copy, does not modify the original)
 	Vector3 Normalize()
 	{
 		float length = Length();
@@ -92,18 +93,18 @@ public:
 		return copy;
 	}
 
-	// Linearly interpolate between two vectors by amount t
-	Vector3 Lerp(const Vector3& to, float t)
-	{
-		t = fmaxf(fminf(t, 1.0f), 0.0f);
-		return Vector3(x + (to.x - x) * t, y + (to.y - y) * t, z + (to.z - z) * t);
-	}
-
 	// Reflects a vector off the plane defined by a normal
 	Vector3 Reflect(const Vector3& normal)
 	{
 		float d = Dot(normal);
 		return Vector3(x - 2.0f * d * normal.x, y - 2.0f * d * normal.y, z - 2.0f * d * normal.z);
+	}
+
+	// Linearly interpolate between two vectors by amount t
+	Vector3 Lerp(const Vector3& to, float t)
+	{
+		t = fmaxf(fminf(t, 1.0f), 0.0f);
+		return Vector3(x + (to.x - x) * t, y + (to.y - y) * t, z + (to.z - z) * t);
 	}
 
 	// Spherically interpolate between two vectors by amount t
@@ -115,7 +116,8 @@ public:
 		float sinTheta = sinf(theta);
 
 		// Vectors are parallel
-		if (sinTheta == 0.0f) {
+		if (sinTheta == 0.0f)
+		{
 			return Lerp(to, t);
 		}	
 
@@ -132,6 +134,14 @@ public:
 		float dy = y - other.y;
 		float dz = z - other.z;
 		return sqrtf(dx * dx + dy * dy + dz * dz);
+	}
+
+	// Set X, Y, and Z to zero (modifies the original)
+	void Zero()
+	{
+		x = 0.0f;
+		y = 0.0f;
+		z = 0.0f;
 	}
 };
 #pragma warning(default:26495)
